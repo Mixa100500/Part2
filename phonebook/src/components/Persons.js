@@ -8,7 +8,10 @@ const Persons = (props) => {
           return <Name 
           name={person.name} 
           number={person.number}
-          key={person.id}/>
+          key={person.id}
+          id={person.id}
+          deletePersone={props.deletePersone}
+          />
         }
       )}
     </ul>

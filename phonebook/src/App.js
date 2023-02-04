@@ -3,6 +3,7 @@ import { useState, useEffect} from 'react'
 import Filter from './components/Filter'
 import PersoneForm from './components/PersoneForm'
 import Persons from './components/Persons'
+import numberService from './services/notes'
 
 
 const App = () => {
@@ -11,7 +12,6 @@ const App = () => {
   const promise = axios.get("http://localhost:3001/persons");
   useEffect(() => {
       promise.then(response => {
-        console.log(response.data);
         setPersons(response.data);
       })
   }, []);
@@ -37,27 +37,61 @@ const App = () => {
     setFound(result);
   }
 
+  const deletePersone = id => {
+    const person = persons.find(p => p.id === id);
+    if (!window.confirm(`delete ${person.name} ${id}`)) return;
+    numberService.remove(id);
+
+    setPersons(persons.filter(
+      person => person.id !== id
+      ));
+  }
+
   const addPerson = (event) => {
     event.preventDefault();
     let isIncudes = false;
+    let identifier;
 
-    persons.forEach(person => {
+    persons.forEach((person, index) => {
       if (person.name !== newName) return;
       isIncudes = true;
+      identifier = index;
     })
+    
+    const person = {
+      name: newName,
+      number: newNumber,
+    };
 
     if (isIncudes) {
-      alert(`${newName} is already added to phonebook`);
+      if (!window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) return;
+      setPersons(
+        persons.map( 
+          person => (person.name === newName) ? { ...person, number: newNumber } : person
+        )
+      );
+      console.log(identifier)
+      numberService
+        .update(identifier + 1, { ...person})
+        .then(returnedPerson => {
+          setPersons(
+            persons.map(
+              person => {
+                console.log(person.id, identifier + 1, person.name);
+                return person.id !== identifier + 1 ? person : returnedPerson
+              }
+            )       
+          )
+        })
+      setNewName('');
+      setNamber('');
       return;
     }
 
-    const person = {
-      name: newName,
-      id: persons.length + 1,
-      number: newNumber,
-    };
-    
-    setPersons(persons.concat(person))
+
+    numberService
+      .create(person)
+      .then(response => setPersons(persons.concat(response)));
     setNewName('');
     setNamber('');
   }
@@ -70,7 +104,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <Filter 
         value={searching}
-        handleNameChange={handleSearchChandge}
+        handleSearchChandge={handleSearchChandge}
       />
       <h2>add a new</h2>
       <PersoneForm
@@ -81,7 +115,9 @@ const App = () => {
         addPerson={addPerson}
       />
       <h2>Numbers</h2>
-      <Persons information = {information}/>
+      <Persons 
+        information = {information}
+        deletePersone={deletePersone}/>
     </div>
   )
 }

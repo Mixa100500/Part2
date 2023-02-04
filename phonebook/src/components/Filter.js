@@ -3,7 +3,7 @@ const Filter = (props) => {
     <div>
       number:
       <input
-        onChange={props.handleNumberChange}
+        onChange={props.handleSearchChandge}
         value={props.newNumber}
       />
     </div>
