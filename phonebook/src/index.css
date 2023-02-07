@@ -1,0 +1,17 @@
+.added {
+  color: green;
+  background-color: rgb(188, 205, 188);
+  font-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.incorrect {
+  color: brown;
+  background-color: rgb(177, 169, 169);
+  font-style: solid;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
